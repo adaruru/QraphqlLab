@@ -1,0 +1,14 @@
+# GraphQL Lab Configuration Example
+# Copy this file to config.yaml and update with your settings
+
+database:
+  host: localhost
+  port: 3306
+  user: root
+  password: your_password_here
+  dbname: graphqllab
+  charset: utf8mb4
+
+server:
+  port: 8080
+  host: localhost

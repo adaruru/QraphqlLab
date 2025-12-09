@@ -2,7 +2,8 @@
   "permissions": {
     "allow": [
       "Bash(go mod init:*)",
-      "Bash(mkdir:*)"
+      "Bash(mkdir:*)",
+      "Bash(go get:*)"
     ],
     "deny": [],
     "ask": []

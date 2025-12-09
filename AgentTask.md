@@ -11,8 +11,8 @@
 
 #### 0001 初始化 Go 專案
 **目標：** 建立基礎 Go 專案結構
-- [ ] 初始化 `go mod`
-- [ ] 建立專案目錄結構
+- [x] 初始化 `go mod`
+- [x] 建立專案目錄結構
   ```
   /cmd          # 主程式入口
   /internal     # 內部套件
@@ -25,23 +25,30 @@
     /static     # JS/CSS 檔案
   /docker       # Docker 相關檔案
   ```
-- [ ] 建立 `.gitignore`
-- [ ] 安裝 Gin 框架：`go get -u github.com/gin-gonic/gin`
+- [x] 建立 `.gitignore`
+- [x] 安裝 Gin 框架：`go get -u github.com/gin-gonic/gin`
 
 #### 0002 MySQL 資料庫設計與實作
 **目標：** 設計資料庫架構並建立測試資料
-- [ ] 設計資料表結構（例如：users, products, orders）
-- [ ] 建立 SQL schema 檔案 `schema.sql`
-- [ ] 建立測試資料 SQL 檔案 `seed.sql`
-- [ ] 安裝 MySQL driver：`go get -u github.com/go-sql-driver/mysql`
-- [ ] 建立資料庫連線設定檔
+- [x] 設計資料表結構（例如：users, products, orders）
+- [x] 建立 SQL schema 檔案 `infra/dbinit/schema.sql`
+  - [x] 使用者資料、薪資明細、到職狀態，供後續前端實作 graphql join 效果
+- [x] 建立測試資料 SQL 檔案 `infra/dbinit/seed.sql`
+  - [x] 新增測試資料，使用者資料、薪資明細、到職狀態，供後續前端實作 graphql join 效果
+- [x] 安裝 MySQL driver：`go get -u github.com/go-sql-driver/mysql`
+- [x] 建立資料庫連線設定檔
 
 #### 0003 Docker Compose 環境配置
 **目標：** 建立容器化開發環境
+- [ ] MySQL `Dockerfile`
+  - MySQL 服務 image
+  - Dockerfile copy `infra/dbinit/*`
+  - schema.sql
+  - seed.sql
+- [ ] 建立 `Dockerfile` for Go application
 - [ ] 建立 `docker-compose.yml`
   - MySQL 服務（port 3306）
   - Go API 服務（port 8080）
-- [ ] 建立 `Dockerfile` for Go application
 - [ ] 設定環境變數檔案 `.env`
 - [ ] 測試 Docker Compose 啟動與連線
 
