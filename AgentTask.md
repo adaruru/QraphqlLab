@@ -40,17 +40,56 @@
 
 #### 0003 Docker Compose 環境配置
 **目標：** 建立容器化開發環境
-- [ ] MySQL `Dockerfile`
+- [x] MySQL `Dockerfile`
   - MySQL 服務 image
   - Dockerfile copy `infra/dbinit/*`
   - schema.sql
   - seed.sql
-- [ ] 建立 `Dockerfile` for Go application
-- [ ] 建立 `docker-compose.yml`
+- [x] 建立 `Dockerfile` for Go application
+- [x] 建立 `docker-compose.yml`
   - MySQL 服務（port 3306）
   - Go API 服務（port 8080）
-- [ ] 設定環境變數檔案 `.env`
-- [ ] 測試 Docker Compose 啟動與連線
+- [x] 設定環境變數檔案 `.env`
+- [x] 測試 Docker Compose 啟動與連線
+
+#### 0003-1 檢查 infra\Dockerfile.mysql
+- ENV MYSQL_DATABASE=graphqllab 這可以直接設定
+- ENV MYSQL_ROOT_PASSWORD=rootpassword
+- 但登入者、PASSWORD 理應規劃在 docker compose
+同時運行多個環境
+
+### 可以同時運行！
+./scripts/start-dev.sh  # Port: 3306, 8080
+./scripts/start-sit.sh  # Port: 3307, 8081
+./scripts/start-uat.sh  # Port: 3308, 8082
+📊 環境變數完整流程圖
+啟動腳本 (start-sit.sh)
+    │
+    ├─> 檢查 .env.sit 存在
+    │
+    ├─> 載入 .env.sit 環境變數
+    │       MYSQL_DATABASE=graphqllab_sit
+    │       API_PORT=8081
+    │       ...
+    │
+    ├─> 執行 docker compose
+    │       -f docker-compose.yml        (基礎配置)
+    │       -f docker-compose.sit.yml    (SIT 覆蓋)
+    │       --env-file .env.sit          (環境變數檔案)
+    │
+    ├─> Docker Compose 合併配置
+    │       基礎配置 + SIT 覆蓋 + .env.sit
+    │
+    ├─> 建立 Container
+    │       Name: graphqllab-mysql-sit
+    │       Port: 3307:3306
+    │       Env: MYSQL_DATABASE=graphqllab_sit
+    │
+    └─> 應用程式讀取環境變數
+            os.Getenv("DB_NAME") -> "graphqllab_sit"
+
+#### 0003-2 說明 config.example.yaml
+- 新增 congif.uat、config.sit 與對應執行 compose 腳本，要可以辨識出環境變數寫入得方法
 
 ---
 

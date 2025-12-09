@@ -1,14 +1,74 @@
 # GraphQL Lab Configuration Example
-# Copy this file to config.yaml and update with your settings
+#
+# This file demonstrates the configuration structure for the GraphQL Lab application.
+# However, the primary configuration method is through .env files for Docker deployments.
+#
+# Configuration Priority:
+# 1. Environment Variables (highest priority) - recommended for Docker
+# 2. .env files - used by Docker Compose
+# 3. YAML config files (this file) - optional, for non-Docker deployments
+#
+# For Docker deployments, use:
+# - .env (development)
+# - .env.sit (System Integration Test)
+# - .env.uat (User Acceptance Test)
+# - .env.prod (Production)
+#
+# Environment variables in .env files will be automatically loaded by Docker Compose
+# and override any settings in this YAML file.
 
+# Database Configuration
+# These values can be overridden by environment variables:
+# - DB_HOST
+# - DB_PORT
+# - DB_USER
+# - DB_PASSWORD
+# - DB_NAME
 database:
-  host: localhost
+  host: localhost           # Use 'mysql' for Docker, 'localhost' for local dev
   port: 3306
   user: root
   password: your_password_here
   dbname: graphqllab
   charset: utf8mb4
 
+# Server Configuration
+# These values can be overridden by environment variables:
+# - SERVER_PORT
+# - SERVER_HOST
+# - GIN_MODE (debug/release)
 server:
   port: 8080
   host: localhost
+  mode: debug               # debug or release
+
+# Logging Configuration
+# Override with LOG_LEVEL environment variable
+logging:
+  level: debug              # debug, info, warning, error
+  format: json              # json or text
+
+# Environment-specific notes:
+#
+# Development (.env):
+#   - GIN_MODE=debug
+#   - LOG_LEVEL=debug
+#   - Ports: MySQL:3306, API:8080
+#
+# SIT (.env.sit):
+#   - GIN_MODE=debug
+#   - LOG_LEVEL=debug
+#   - Ports: MySQL:3307, API:8081
+#   - Database: graphqllab_sit
+#
+# UAT (.env.uat):
+#   - GIN_MODE=release
+#   - LOG_LEVEL=info
+#   - Ports: MySQL:3308, API:8082
+#   - Database: graphqllab_uat
+#
+# Production (.env.prod):
+#   - GIN_MODE=release
+#   - LOG_LEVEL=warning
+#   - Strong passwords required
+#   - Database: graphqllab

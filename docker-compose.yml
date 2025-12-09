@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  # MySQL Database Service
+  mysql:
+    build:
+      context: ./infra
+      dockerfile: Dockerfile.mysql
+    container_name: graphqllab-mysql
+    restart: unless-stopped
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpassword}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-graphqllab}
+      MYSQL_USER: ${MYSQL_USER:-graphqluser}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-graphqlpass}
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./infra/dbinit:/docker-entrypoint-initdb.d:ro
+    networks:
+      - graphqllab-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD:-rootpassword}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+  # Go API Service
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: graphqllab-api
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-8080}:8080"
+    environment:
+      # Database configuration
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_USER: ${MYSQL_USER:-graphqluser}
+      DB_PASSWORD: ${MYSQL_PASSWORD:-graphqlpass}
+      DB_NAME: ${MYSQL_DATABASE:-graphqllab}
+      # Application configuration
+      SERVER_PORT: 8080
+      GIN_MODE: ${GIN_MODE:-debug}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - graphqllab-network
+    volumes:
+      # Mount web directory for development (optional - comment out in production)
+      - ./web:/root/web:ro
+
+# Volumes for data persistence
+volumes:
+  mysql_data:
+    driver: local
+
+# Network configuration
+networks:
+  graphqllab-network:
+    driver: bridge

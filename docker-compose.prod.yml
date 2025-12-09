@@ -1,0 +1,31 @@
+# Docker Compose Override for Production Environment
+# Usage: docker compose -f docker-compose.yml -f docker-compose.prod.yml --env-file .env.prod up -d
+
+version: '3.8'
+
+services:
+  mysql:
+    container_name: graphqllab-mysql-prod
+    restart: always
+    environment:
+      ENVIRONMENT: production
+    volumes:
+      - mysql_data_prod:/var/lib/mysql
+    # Production: Don't expose MySQL port externally for security
+    # Remove the ports mapping or use internal network only
+
+  api:
+    container_name: graphqllab-api-prod
+    restart: always
+    environment:
+      ENVIRONMENT: production
+      GIN_MODE: release
+    # Production considerations:
+    # - Use a reverse proxy (nginx) in front
+    # - Enable HTTPS
+    # - Add rate limiting
+    # - Add proper monitoring
+
+volumes:
+  mysql_data_prod:
+    driver: local

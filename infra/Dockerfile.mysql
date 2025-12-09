@@ -1,0 +1,15 @@
+# MySQL Dockerfile with automatic database initialization
+FROM mysql:8.0
+
+# Copy database initialization scripts
+# Scripts in /docker-entrypoint-initdb.d/ are automatically executed on first startup
+COPY dbinit/schema.sql /docker-entrypoint-initdb.d/01-schema.sql
+COPY dbinit/seed.sql /docker-entrypoint-initdb.d/02-seed.sql
+
+# Expose MySQL port
+EXPOSE 3306
+
+# Note: Database name, passwords, and users are configured in docker-compose.yml
+# This allows for better security and environment-specific configuration
+# The official MySQL image already has the proper entrypoint
+# It will automatically execute scripts in /docker-entrypoint-initdb.d/ in alphabetical order
