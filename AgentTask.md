@@ -91,6 +91,8 @@
 #### 0003-2 說明 config.example.yaml
 - 新增 congif.uat、config.sit 與對應執行 compose 腳本，要可以辨識出環境變數寫入得方法
 
+#### 0003-3 說明 config.example.yaml
+- 深入說明 環境變數為什麼要分 有的地方 config 有的放 env
 ---
 
 ### 階段二：資料存取層實作
