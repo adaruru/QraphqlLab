@@ -1,9 +1,11 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
+# 禁用 VirtualBox 檢查
+ENV['VAGRANT_DEFAULT_PROVIDER'] = 'hyperv'
+
 Vagrant.configure("2") do |config|
-  # Base Box: Ubuntu 22.04 LTS (Jammy Jellyfish)
-  config.vm.box = "ubuntu/jammy64"
+  config.vm.box = "generic/ubuntu2204" 
   config.vm.box_version = ">= 0"
 
   # VM 基本設定
@@ -40,14 +42,8 @@ Vagrant.configure("2") do |config|
   end
 
   # 磁碟擴充配置
-  # 注意: 需要安裝 vagrant-disksize plugin
-  # 執行: vagrant plugin install vagrant-disksize
-  if Vagrant.has_plugin?("vagrant-disksize")
-    config.disksize.size = "100GB"
-  else
-    puts "警告: vagrant-disksize plugin 未安裝，磁碟將使用預設大小"
-    puts "執行安裝: vagrant plugin install vagrant-disksize"
-  end
+  # 注意: vagrant-disksize plugin 與 Hyper-V 不相容，暫時停用
+  # Hyper-V 磁碟大小由 base box 決定(128GB)，或在 VM 建立後手動擴充
 
   # Provision 腳本: VM 初始化時自動執行
   config.vm.provision "shell", path: "vagrant/provision.sh"
@@ -77,7 +73,7 @@ Vagrant.configure("2") do |config|
     - VM Name: lab01
     - Hostname: lab01
     - RAM: 2GB
-    - Disk: 100GB
+    - Disk: 128GB base box 預設決定，如不夠在手動擴充
     - Network: Public Network (Bridged)
 
   查詢 VM IP 位址:
@@ -88,14 +84,9 @@ Vagrant.configure("2") do |config|
        vagrant ssh
 
     2. 標準 SSH (需先查詢 IP):
-       ssh vagrant@<VM_IP>
-       ssh lab01@<VM_IP>   (密碼: adaruru)
-       ssh root@<VM_IP>    (密碼: adaruru)
-
-  存取服務 (使用 VM IP):
-    - Go API (DEV): http://<VM_IP>:8080
-    - Go API (SIT): http://<VM_IP>:8081
-    - MySQL: <VM_IP>:3306
+       ssh vagrant@192.168.11.110
+       ssh lab01@192.168.11.110   (密碼: adaruru)
+       ssh root@192.168.11.110    (密碼: adaruru)
 
   常用指令:
     - vagrant ssh                        # 進入 VM

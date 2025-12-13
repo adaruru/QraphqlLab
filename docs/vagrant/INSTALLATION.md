@@ -77,11 +77,6 @@ Restart-Computer
 #### 方式 1: 使用 Chocolatey (推薦)
 
 ```powershell
-# 安裝 Chocolatey (若尚未安裝)
-Set-ExecutionPolicy Bypass -Scope Process -Force
-[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072
-iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
-
 # 安裝 Vagrant
 choco install vagrant -y
 ```
@@ -112,11 +107,8 @@ Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V
 ### Step 4: 安裝 Vagrant Plugins
 
 ```bash
-# 必要: 磁碟擴充 plugin
-vagrant plugin install vagrant-disksize
-
-# 推薦: 重新載入 plugin (簡化 provision 重跑流程)
-vagrant plugin install vagrant-reload
+# hyper 無法使用，重新載入 plugin (簡化 provision 重跑流程)
+# vagrant plugin install vagrant-reload
 
 # 驗證 plugin 安裝
 vagrant plugin list
@@ -124,7 +116,6 @@ vagrant plugin list
 
 預期輸出:
 ```
-vagrant-disksize (0.1.3, global)
 vagrant-reload (0.0.1, global)
 ```
 
@@ -138,11 +129,19 @@ Hyper-V 需要手動建立虛擬交換器:
 2. 右側選單 → **虛擬交換器管理員**
 3. 新增虛擬交換器:
    - 類型: **外部**
-   - 名稱: `Vagrant-External-Switch`
+   - 名稱: 自訂名稱（`外部虛擬交換器`）
    - 連線類型: 選擇你的實體網路卡
 4. 確定
 
-**重要**: Vagrant 會自動使用此交換器，無需額外配置。
+**重要說明**:
+
+- **交換器名稱可以自訂**，不強制使用特定名稱
+- **必須在 Vagrantfile 中明確指定**交換器名稱才能自動使用：
+  ```ruby
+  config.vm.network "public_network",
+    bridge: "外部虛擬交換器"  # 必須與 Hyper-V 中的名稱完全一致
+  ```
+- 如果不指定 `bridge:` 參數，每次 `vagrant up` 時會提示你手動選擇交換器
 
 ---
 
@@ -165,7 +164,8 @@ vagrant ssh
 
 # 在 VM 內檢查
 uname -a
-# 預期輸出: Linux vagrant 5.15.x-xxx-generic #xxx-Ubuntu SMP ...
+# 預期輸出: Linux lab01 5.15.x-xxx-generic #xxx-Ubuntu SMP ...
+# 注意: 測試 VM 的 hostname 會是 vagrant，實際專案使用 lab01
 
 # 退出 VM
 exit
@@ -180,33 +180,20 @@ rmdir vagrant-test
 
 ## 常見問題
 
-### Q1: Hyper-V 與 VirtualBox 衝突？
-**A**: 是的，Hyper-V 與 VirtualBox 無法同時運行。若需切換:
-
-```powershell
-# 停用 Hyper-V
-bcdedit /set hypervisorlaunchtype off
-Restart-Computer
-
-# 啟用 Hyper-V
-bcdedit /set hypervisorlaunchtype auto
-Restart-Computer
-```
-
-### Q2: vagrant up 出現網路錯誤？
+### Q1: vagrant up 出現網路錯誤？
 **A**: 檢查虛擬交換器配置:
 ```powershell
 Get-VMSwitch
 ```
 確保有外部交換器存在。
 
-### Q3: SMB 共享資料夾失敗？
+### Q2: SMB 共享資料夾失敗？
 **A**: 啟用 Windows SMB 功能:
 ```powershell
 Enable-WindowsOptionalFeature -Online -FeatureName SMB1Protocol
 ```
 
-### Q4: 權限不足錯誤？
+### Q3: 權限不足錯誤？
 **A**: 確保以**系統管理員身分**執行 PowerShell/Terminal。
 
 ---

@@ -62,3 +62,4 @@ temp/
 config.yaml
 config.json
 !config.example.*
+.vagrant/

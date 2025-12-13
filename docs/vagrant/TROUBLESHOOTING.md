@@ -88,28 +88,73 @@ vagrant up --provider=hyperv
 
 ---
 
-### Q3: vagrant-disksize Plugin 安裝失敗
+### Q3: vagrant-disksize 與 Hyper-V 不相容
 
 **錯誤訊息**:
 ```
-ERROR: Failed to build gem native extension.
+Vagrant could not detect VirtualBox! Make sure VirtualBox is properly installed.
 ```
+
+**原因**:
+- `vagrant-disksize` 插件僅支援 VirtualBox，與 Hyper-V **不相容**
+- 該插件會強制檢查 VirtualBox，導致 Hyper-V 無法啟動
 
 **解決方案**:
 
-```bash
-# Windows 需先安裝 MSYS2 Development Tools
-# 方式 1: 重新安裝 Vagrant (勾選 Development Tools)
-
-# 方式 2: 手動安裝
-vagrant plugin install vagrant-disksize --plugin-clean-sources --plugin-source https://rubygems.org
+```powershell
+# 移除 vagrant-disksize 插件
+vagrant plugin uninstall vagrant-disksize
 ```
 
-若持續失敗，可暫時不使用此 plugin，手動擴充磁碟:
-```ruby
-# Vagrantfile 移除或註解此段
-# config.disksize.size = "100GB"
+**Hyper-V 磁碟擴充替代方案** → 見 Q3-1
+
+---
+
+### Q3-1: Hyper-V 如何擴充虛擬磁碟？
+
+**重要**: `vagrant-disksize` 是在 VM **創建時**設定磁碟大小，**不是**給已存在的 VM 加空間。
+
+#### 方法 1: PowerShell 擴充（推薦）
+
+```powershell
+# 1. 關閉 VM
+vagrant halt
+
+# 2. 取得 VHDX 路徑
+Get-VM -Name "lab01" | Select-Object -ExpandProperty HardDrives | Select-Object Path
+
+# 3. 擴充虛擬硬碟到 100GB
+Resize-VHD -Path "實際的VHDX路徑" -SizeBytes 100GB
+
+# 4. 啟動 VM
+vagrant up
+
+# 5. 進入 VM，擴充檔案系統
+vagrant ssh
+sudo growpart /dev/sda 1
+sudo resize2fs /dev/sda1
+
+# 6. 驗證磁碟大小
+df -h
 ```
+
+#### 方法 2: Hyper-V 管理員（圖形化）
+
+1. 開啟 **Hyper-V 管理員**
+2. 關閉 VM (`vagrant halt`)
+3. 右鍵點擊 VM → **設定** → **硬碟** → **編輯**
+4. 選擇 **展開** → 輸入新大小 (如 100GB)
+5. 啟動 VM 後，進入系統擴充分區（同方法 1 的步驟 5-6）
+
+#### 方法 3: 建立新 VM 時指定大小
+
+目前 Vagrant + Hyper-V 對此支援有限，建議使用方法 1 或 2。
+
+**注意事項**:
+- ✅ 可以擴充磁碟（變大）
+- ❌ 不能縮小磁碟
+- ✅ 不需要砍掉重開 VM
+- ⚠️  操作前建議備份重要資料
 
 ---
 

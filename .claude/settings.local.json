@@ -12,7 +12,12 @@
       "Bash(go run:*)",
       "Bash(find:*)",
       "Bash(powershell -Command \"Get-VMSwitch | Where-Object {$_.SwitchType -eq ''External''} | Select-Object -First 1 -ExpandProperty Name\")",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(vagrant plugin install:*)",
+      "Bash(powershell -Command \"vagrant plugin list\")",
+      "Bash(powershell -Command \"Get-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V | Select-Object State\")",
+      "Bash(powershell -Command:*)",
+      "Bash(vagrant up:*)"
     ],
     "deny": [],
     "ask": []
