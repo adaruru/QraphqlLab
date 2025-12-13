@@ -11,7 +11,8 @@
       "Bash(go build:*)",
       "Bash(go run:*)",
       "Bash(find:*)",
-      "Bash(powershell -Command \"Get-VMSwitch | Where-Object {$_.SwitchType -eq ''External''} | Select-Object -First 1 -ExpandProperty Name\")"
+      "Bash(powershell -Command \"Get-VMSwitch | Where-Object {$_.SwitchType -eq ''External''} | Select-Object -First 1 -ExpandProperty Name\")",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []

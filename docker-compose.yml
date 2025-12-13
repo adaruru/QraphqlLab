@@ -15,10 +15,7 @@ services:
       mysql:
         condition: service_healthy
     networks:
-    - graphqllab-network
-    volumes:
-    - ./config:/root/config:ro
-    - ./web:/root/web:ro
+    - set-network-01
 
   graphqllab-dev:
     build:
@@ -30,11 +27,9 @@ services:
     - "8080:8080"
     environment:
       APP_ENV: development
-    depends_on:
-      mysql:
-        condition: service_healthy
     networks:
-    - graphqllab-network
-    volumes:
-    - ./config:/root/config:ro
-    - ./web:/root/web:ro
+    - set-network-01
+
+networks:
+  set-network-01:
+    driver: bridge
