@@ -92,8 +92,45 @@
 - 新增 congif.uat、config.sit 與對應執行 compose 腳本，要可以辨識出環境變數寫入得方法
 
 #### 0003-3 說明 config.example.yaml
-- 深入說明 環境變數為什麼要分 有的地方 config 有的放 env
+-  環境變數為什麼要分 有的地方 config 有的放 env
+-  使用結論: 只放 config、移除所有env
+-  只用 yaml 不使用 viper
+-  版本引用差異: 現代專案，直接用 GitHub、歷史原因 gopkg 仍適用、作者選擇用自己的域名，顯示專業性
 ---
+
+#### 0003-4 閱讀所有 task 0001-0003-3
+- 只擷取結論更新於 README.md
+- 重要知識紀錄於 README.md
+
+#### 0003-5 不應該有 uat 環境
+
+- 應該只有一個 sit 環境展示切環境效果
+- 應該只有一個 compose 檔執行 sit 啟用 container
+- 應該只有一個 db ，所有環境共用 ，sit config 不應該出現其他 db 連線，應該直接移除，不覆蓋而使用 config.yaml 來顯現兩個檔案都會讀的效果 
+
+### 階段一之二：資料存取層實作
+
+#### 0003-6 新增 Vagrant 開發環境
+
+- [x] 建立 Vagrantfile 配置
+  - [x] 使用 ubuntu/jammy64 box
+  - [x] RAM 2G, Disk 100G
+  - [x] 網路配置 (Private Network + Port Forwarding)
+  - [x] Hyper-V Provider 設定
+  - [x] 同步資料夾配置
+- [x] 建立 provision.sh 自動化腳本
+  - [x] 安裝 Docker Engine
+  - [x] 建立使用者 (admin, 密碼: adaruru)
+  - [x] 設定 root 密碼 (adaruru)
+  - [x] 配置使用者權限 (docker group)
+- [x] 建立完整文件
+  - [x] INSTALLATION.md - Vagrant 安裝指南
+  - [x] CONFIGURATION.md - Vagrantfile 配置詳解
+  - [x] PROVISIONING.md - Provision 腳本說明
+  - [x] OPERATIONS.md - 日常操作指南
+  - [x] TROUBLESHOOTING.md - 常見問題排除
+  - [x] ENGINE_BASICS.md - Docker Engine 操作教學
+- [x] 更新 README.md 整合 Vagrant 說明
 
 ### 階段二：資料存取層實作
 

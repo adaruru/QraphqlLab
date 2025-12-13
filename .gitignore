@@ -17,17 +17,16 @@ vendor/
 # Go workspace file
 go.work
 
-# Environment variables
+# Environment variables (legacy - no longer used)
 .env
 .env.local
 .env.*.local
-
-# Environment-specific config files (keep .sit and .uat for reference, exclude .prod)
+.env.sit
+.env.uat
 .env.prod
-config.yaml
-config.sit.yaml
-config.uat.yaml
-config.prod.yaml
+
+# Config files - production contains sensitive data
+config/config.prod.yaml
 
 # IDE specific files
 .vscode/

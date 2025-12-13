@@ -1,25 +1,25 @@
 # Docker Compose Override for SIT Environment
-# Usage: docker compose -f docker-compose.yml -f docker-compose.sit.yml --env-file .env.sit up -d
+# 展示如何透過 APP_ENV 切換環境配置
+# Usage: docker compose -f docker-compose.yml -f docker-compose.sit.yml up -d
 
 version: '3.8'
 
 services:
-  mysql:
-    container_name: graphqllab-mysql-sit
-    ports:
-      - "3307:3306"  # Different port for SIT to avoid conflicts
-    environment:
-      ENVIRONMENT: sit
-    volumes:
-      - mysql_data_sit:/var/lib/mysql
-
   api:
-    container_name: graphqllab-api-sit
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: graphqllab-api
+    restart: unless-stopped
     ports:
-      - "8081:8080"  # Different port for SIT to avoid conflicts
+    - "8080:8080"
     environment:
-      ENVIRONMENT: sit
-
-volumes:
-  mysql_data_sit:
-    driver: local
+      APP_ENV: sit
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+    - graphqllab-network
+    volumes:
+    - ./config:/root/config:ro
+    - ./web:/root/web:ro

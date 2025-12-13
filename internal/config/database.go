@@ -11,23 +11,29 @@ import (
 
 // DatabaseConfig holds database connection configuration
 type DatabaseConfig struct {
-	Host     string
-	Port     int
-	User     string
-	Password string
-	DBName   string
-	Charset  string
+	Host                  string        `yaml:"host"`
+	Port                  int           `yaml:"port"`
+	User                  string        `yaml:"user"`
+	Password              string        `yaml:"password"`
+	Name                  string        `yaml:"name"`
+	Charset               string        `yaml:"charset"`
+	MaxOpenConnections    int           `yaml:"max_open_connections"`
+	MaxIdleConnections    int           `yaml:"max_idle_connections"`
+	ConnectionMaxLifetime time.Duration `yaml:"connection_max_lifetime"`
 }
 
 // DefaultDatabaseConfig returns default database configuration
 func DefaultDatabaseConfig() *DatabaseConfig {
 	return &DatabaseConfig{
-		Host:     "localhost",
-		Port:     3306,
-		User:     "root",
-		Password: "password",
-		DBName:   "graphqllab",
-		Charset:  "utf8mb4",
+		Host:                  "localhost",
+		Port:                  3306,
+		User:                  "root",
+		Password:              "password",
+		Name:                  "graphqllab",
+		Charset:               "utf8mb4",
+		MaxOpenConnections:    25,
+		MaxIdleConnections:    5,
+		ConnectionMaxLifetime: 5 * time.Minute,
 	}
 }
 
@@ -38,7 +44,7 @@ func NewDatabaseConnection(cfg *DatabaseConfig) (*sql.DB, error) {
 		cfg.Password,
 		cfg.Host,
 		cfg.Port,
-		cfg.DBName,
+		cfg.Name,
 		cfg.Charset,
 	)
 
@@ -47,10 +53,10 @@ func NewDatabaseConnection(cfg *DatabaseConfig) (*sql.DB, error) {
 		return nil, fmt.Errorf("failed to open database: %w", err)
 	}
 
-	// Set connection pool settings
-	db.SetMaxOpenConns(25)
-	db.SetMaxIdleConns(5)
-	db.SetConnMaxLifetime(5 * time.Minute)
+	// Set connection pool settings from config
+	db.SetMaxOpenConns(cfg.MaxOpenConnections)
+	db.SetMaxIdleConns(cfg.MaxIdleConnections)
+	db.SetConnMaxLifetime(cfg.ConnectionMaxLifetime)
 
 	// Verify connection
 	if err := db.Ping(); err != nil {
@@ -58,7 +64,7 @@ func NewDatabaseConnection(cfg *DatabaseConfig) (*sql.DB, error) {
 	}
 
 	log.Printf("Successfully connected to database: %s@%s:%d/%s",
-		cfg.User, cfg.Host, cfg.Port, cfg.DBName)
+		cfg.User, cfg.Host, cfg.Port, cfg.Name)
 
 	return db, nil
 }

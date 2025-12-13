@@ -1,0 +1,17 @@
+# GraphQL Lab Configuration - SIT Environment
+# 展示配置繼承：只覆蓋部分欄位，其他從 config.yaml 繼承
+
+# Environment identifier
+environment: sit
+
+# Logging Configuration - 覆蓋日誌等級
+logging:
+  level: info  # SIT 使用 info，DEV 使用 debug
+  format: json
+
+# Server Configuration - 覆蓋伺服器模式
+server:
+  mode: release  # SIT 使用 release mode
+
+# 其他配置（database, graphql, features）都從 config.yaml 繼承
+# 展示配置的繼承機制
