@@ -58,15 +58,15 @@ echo "[5/8] 設定使用者權限..."
 # 新增 vagrant 使用者到 docker group (免 sudo)
 sudo usermod -aG docker vagrant
 
-# 建立 admin 使用者
-echo "[6/8] 建立 admin 使用者..."
-if ! id "admin" &>/dev/null; then
-    sudo useradd -m -s /bin/bash -G sudo,docker admin
-    echo "admin:adaruru" | sudo chpasswd
-    echo "admin 使用者已建立 (密碼: adaruru)"
+# 建立 lab01 使用者
+echo "[6/8] 建立 lab01 使用者..."
+if ! id "lab01" &>/dev/null; then
+    sudo useradd -m -s /bin/bash -G sudo,docker lab01
+    echo "lab01:adaruru" | sudo chpasswd
+    echo "lab01 使用者已建立 (密碼: adaruru)"
 else
-    echo "admin 使用者已存在"
-    sudo usermod -aG docker admin
+    echo "lab01 使用者已存在"
+    sudo usermod -aG docker lab01
 fi
 
 # 設定 root 密碼
@@ -87,7 +87,7 @@ echo "=========================================="
 echo ""
 echo "使用者資訊:"
 echo "  - vagrant (sudo 權限, docker group)"
-echo "  - admin   (sudo 權限, docker group, 密碼: adaruru)"
+echo "  - lab01   (sudo 權限, docker group, 密碼: adaruru)"
 echo "  - root    (密碼: adaruru)"
 echo ""
 echo "已安裝工具:"
@@ -98,7 +98,7 @@ echo ""
 echo "下一步:"
 echo "  1. 登出後重新登入以套用 docker group 權限"
 echo "  2. 執行: docker run hello-world"
-echo "  3. 執行: cd /vagrant && docker compose up -d"
+echo "  3. Clone 專案並啟動服務"
 echo "=========================================="
 
 # 顯示磁碟資訊

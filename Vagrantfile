@@ -7,31 +7,22 @@ Vagrant.configure("2") do |config|
   config.vm.box_version = ">= 0"
 
   # VM 基本設定
-  config.vm.hostname = "graphqllab-dev"
-
-  # 網路配置
-  # Private Network: Host-Only 模式，用於開發環境
-  config.vm.network "private_network", ip: "192.168.56.10"
-
-  # Port Forwarding: 將 VM 服務暴露到 Windows Host
-  # Docker 相關服務
-  config.vm.network "forwarded_port", guest: 8080, host: 8080, host_ip: "127.0.0.1"  # Go API (DEV)
-  config.vm.network "forwarded_port", guest: 8081, host: 8081, host_ip: "127.0.0.1"  # Go API (SIT)
-  config.vm.network "forwarded_port", guest: 3306, host: 3306, host_ip: "127.0.0.1"  # MySQL
-  config.vm.network "forwarded_port", guest: 2375, host: 2375, host_ip: "127.0.0.1"  # Docker Daemon (可選)
+  config.vm.hostname = "lab01"
+  config.vm.network "public_network",
+    bridge: "外部虛擬交換器",
+    ip: "192.168.11.110"
 
   # 同步資料夾配置
-  # 注意: Hyper-V 預設使用 SMB，Windows 需要啟用 SMB 功能
-  # 方案 1: 同步專案目錄 (開發用，可能較慢)
-  config.vm.synced_folder ".", "/vagrant", disabled: false
+  # 生產環境模擬：停用同步資料夾，改用 Git Clone
+  config.vm.synced_folder ".", "/vagrant", disabled: true
 
-  # 方案 2: 建議在 VM 內用 Git Clone (生產環境模擬)
-  # config.vm.synced_folder ".", "/vagrant", disabled: true
+  # 若開發時需要同步資料夾，可啟用
+  # config.vm.synced_folder ".", "/vagrant", disabled: false
 
   # Hyper-V Provider 配置
   config.vm.provider "hyperv" do |h|
     # VM 名稱
-    h.vmname = "GraphQLLab-DevVM"
+    h.vmname = "lab01"
 
     # 記憶體配置: 2GB
     h.memory = 2048
@@ -46,13 +37,6 @@ Vagrant.configure("2") do |config|
     # 自動啟動與停止時間設定
     h.auto_start_action = "Nothing"
     h.auto_stop_action = "ShutDown"
-  end
-
-  # VirtualBox Provider 配置 (備用，若不使用 Hyper-V)
-  config.vm.provider "virtualbox" do |vb|
-    vb.name = "GraphQLLab-DevVM"
-    vb.memory = 2048
-    vb.cpus = 2
   end
 
   # 磁碟擴充配置
@@ -75,6 +59,14 @@ Vagrant.configure("2") do |config|
   config.ssh.forward_agent = true
   config.ssh.insert_key = true
 
+  # 允許密碼登入 (生產環境模擬)
+  config.vm.provision "shell", inline: <<-SHELL
+    # 啟用 SSH 密碼認證
+    sudo sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
+    sudo sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+    sudo systemctl restart sshd
+  SHELL
+
   # 訊息提示
   config.vm.post_up_message = <<-MESSAGE
   ========================================
@@ -82,28 +74,42 @@ Vagrant.configure("2") do |config|
   ========================================
 
   VM 資訊:
-    - IP: 192.168.56.10
-    - Hostname: graphqllab-dev
+    - VM Name: lab01
+    - Hostname: lab01
     - RAM: 2GB
     - Disk: 100GB
+    - Network: Public Network (Bridged)
 
-  存取方式:
-    - SSH: vagrant ssh
-    - Go API (DEV): http://localhost:8080
-    - Go API (SIT): http://localhost:8081
-    - MySQL: localhost:3306
+  查詢 VM IP 位址:
+    vagrant ssh -c "ip addr show | grep 'inet '"
+
+  SSH 連線方式:
+    1. Vagrant SSH:
+       vagrant ssh
+
+    2. 標準 SSH (需先查詢 IP):
+       ssh vagrant@<VM_IP>
+       ssh lab01@<VM_IP>   (密碼: adaruru)
+       ssh root@<VM_IP>    (密碼: adaruru)
+
+  存取服務 (使用 VM IP):
+    - Go API (DEV): http://<VM_IP>:8080
+    - Go API (SIT): http://<VM_IP>:8081
+    - MySQL: <VM_IP>:3306
 
   常用指令:
-    - vagrant ssh          # 進入 VM
-    - vagrant halt         # 關閉 VM
-    - vagrant reload       # 重新啟動 VM
-    - vagrant destroy      # 刪除 VM
-    - vagrant provision    # 重新執行 provision
+    - vagrant ssh                        # 進入 VM
+    - vagrant ssh -c "ip a"              # 查看 VM IP
+    - vagrant halt                       # 關閉 VM
+    - vagrant reload                     # 重新啟動 VM
+    - vagrant destroy                    # 刪除 VM
+    - vagrant provision                  # 重新執行 provision
 
   下一步:
-    1. vagrant ssh
-    2. cd /vagrant
-    3. docker compose up -d
+    1. 查詢 VM IP: vagrant ssh -c "hostname -I"
+    2. SSH 連線: ssh vagrant@<VM_IP>
+    3. Clone 專案: git clone <repo_url>
+    4. 啟動服務: docker compose up -d
   ========================================
   MESSAGE
 end
