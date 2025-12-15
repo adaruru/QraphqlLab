@@ -52,62 +52,14 @@
 - [x] 設定環境變數檔案 `.env`
 - [x] 測試 Docker Compose 啟動與連線
 
-#### 0003-1 檢查 infra\Dockerfile.mysql
-- ENV MYSQL_DATABASE=graphqllab 這可以直接設定
-- ENV MYSQL_ROOT_PASSWORD=rootpassword
-- 但登入者、PASSWORD 理應規劃在 docker compose
-同時運行多個環境
+#### 0003-1 、0003-2 、0003-3 、0003-4 檢查 infra\Dockerfile.mysql
+- docker-compose.db.yml，MYSQL_DATABASE=graphqllab 、MYSQL_ROOT_PASSWORD=rootpassword 這可以直接設定
+- 新增 congif.uat、與對應執行 compose 設定，docker-compose.yml 一次部屬  api dev 環境與 sit 環境
 
-### 可以同時運行！
-./scripts/start-dev.sh  # Port: 3306, 8080
-./scripts/start-sit.sh  # Port: 3307, 8081
-./scripts/start-uat.sh  # Port: 3308, 8082
-📊 環境變數完整流程圖
-啟動腳本 (start-sit.sh)
-    │
-    ├─> 檢查 .env.sit 存在
-    │
-    ├─> 載入 .env.sit 環境變數
-    │       MYSQL_DATABASE=graphqllab_sit
-    │       API_PORT=8081
-    │       ...
-    │
-    ├─> 執行 docker compose
-    │       -f docker-compose.yml        (基礎配置)
-    │       -f docker-compose.sit.yml    (SIT 覆蓋)
-    │       --env-file .env.sit          (環境變數檔案)
-    │
-    ├─> Docker Compose 合併配置
-    │       基礎配置 + SIT 覆蓋 + .env.sit
-    │
-    ├─> 建立 Container
-    │       Name: graphqllab-mysql-sit
-    │       Port: 3307:3306
-    │       Env: MYSQL_DATABASE=graphqllab_sit
-    │
-    └─> 應用程式讀取環境變數
-            os.Getenv("DB_NAME") -> "graphqllab_sit"
-
-#### 0003-2 說明 config.example.yaml
-- 新增 congif.uat、config.sit 與對應執行 compose 腳本，要可以辨識出環境變數寫入得方法
-
-#### 0003-3 說明 config.example.yaml
 -  環境變數為什麼要分 有的地方 config 有的放 env
--  使用結論: 只放 config、移除所有env
--  只用 yaml 不使用 viper
--  版本引用差異: 現代專案，直接用 GitHub、歷史原因 gopkg 仍適用、作者選擇用自己的域名，顯示專業性
----
-
-#### 0003-4 閱讀所有 task 0001-0003-3
-- 只擷取結論更新於 README.md
-- 重要知識紀錄於 README.md
-
-#### 0003-5 不應該有 uat 環境
-
-- 應該只有一個 sit 環境展示切環境效果
-- 應該只有一個 compose 檔執行 sit 啟用 container
-- 應該只有一個 db ，所有環境共用 ，sit config 不應該出現其他 db 連線，應該直接移除，不覆蓋而使用 config.yaml 來顯現兩個檔案都會讀的效果 
-
+   -  使用結論: 只放 config、移除所有env
+   -  只用 yaml 不使用 viper
+   -  版本引用差異: 現代專案，直接用 GitHub、歷史原因 gopkg 仍適用、作者選擇用自己的域名，顯示專業
 ### 階段一之二：資料存取層實作
 
 #### 0003-6 新增 Vagrant 開發環境

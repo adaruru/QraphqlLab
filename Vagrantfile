@@ -16,10 +16,10 @@ Vagrant.configure("2") do |config|
 
   # 同步資料夾配置
   # 生產環境模擬：停用同步資料夾，改用 Git Clone
-  config.vm.synced_folder ".", "/vagrant", disabled: true
+  # config.vm.synced_folder ".", "/vagrant", disabled: true
 
   # 若開發時需要同步資料夾，可啟用
-  # config.vm.synced_folder ".", "/vagrant", disabled: false
+  config.vm.synced_folder ".", "/vagrant", disabled: false
 
   # Hyper-V Provider 配置
   config.vm.provider "hyperv" do |h|
@@ -30,7 +30,7 @@ Vagrant.configure("2") do |config|
     h.memory = 2048
 
     # CPU 核心數
-    h.cpus = 2
+    h.cpus = 1
 
     # 啟用動態記憶體 (Hyper-V 特性)
     h.enable_virtualization_extensions = true
@@ -72,6 +72,7 @@ Vagrant.configure("2") do |config|
   VM 資訊:
     - VM Name: lab01
     - Hostname: lab01
+    - cpus: 1
     - RAM: 2GB
     - Disk: 128GB base box 預設決定，如不夠在手動擴充
     - Network: Public Network (Bridged)

@@ -29,7 +29,8 @@ config.vm.box_version = ">= 0"
   - **Hyper-V 必須使用 `generic/` 系列**
   - `generic/ubuntu2204` 專為多 provider 設計（VirtualBox、Hyper-V、VMware）
   - 不能直接 vagrant up --provider=hyperv
-  - 必須先 vagrant box add generic/ubuntu2204
+  - 可以先下載 vagrant box add generic/ubuntu2204
+  - 不下載直接 vagrant up 也可以，啟動前會先檢查，如果 server 沒有，cli 一樣會先下載。
   - 且下載時會問你， Please review the list and choose the provider you will be working with.
   - 下載時間約 1 分半，看個人網速
 

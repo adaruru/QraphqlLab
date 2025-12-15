@@ -154,7 +154,7 @@ Hyper-V 需要手動建立虛擬交換器:
 mkdir vagrant-test && cd vagrant-test
 
 # 初始化 Vagrantfile
-vagrant init ubuntu/jammy64
+vagrant init generic/ubuntu2204
 
 # 啟動 VM
 vagrant up --provider=hyperv
